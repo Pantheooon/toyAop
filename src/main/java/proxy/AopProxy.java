@@ -1,4 +1,8 @@
 package proxy;
 
-public interface AopProxy {
+public interface AopProxy<T> {
+
+
+    T get(T t);
+
 }
