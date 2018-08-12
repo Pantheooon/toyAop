@@ -1,18 +1,39 @@
 package proxy;
 
-import expression.PointCut;
-import interceptor.MethodInterceptor;
+import advice.JoinPoint;
+import advice.MethodInvocation;
+import expression.TargetObject;
+import interceptor.MethodIntercept;
+import interceptor.ReflectiveMethodInvocation;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
 
+import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Set;
 
-public class CglibProxy<T> extends AbstractAopProxy<T> {
+public class CglibProxy<T> implements AopProxy<T>, MethodInterceptor {
 
-    public CglibProxy(List<MethodInterceptor> interceptors, T target) {
-        super(interceptors, target);
+    private Enhancer enhancer = new Enhancer();
+
+    private List<MethodIntercept> intercepts;
+
+    private T target;
+
+    public CglibProxy(List<MethodIntercept> interceptors, T target) {
+        this.intercepts = interceptors;
+        this.target = target;
     }
 
     public T get(T o) {
-        return null;
+        enhancer.setSuperclass(o.getClass());
+        enhancer.setCallback(this);
+        return (T) enhancer.create();
     }
+
+    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) {
+        JoinPoint invocation = new ReflectiveMethodInvocation(intercepts, new TargetObject(target, args, method));
+        return invocation.proceed();
+    }
+
 }

@@ -3,8 +3,6 @@ package interceptor;
 import advice.Advice;
 import expression.PointCut;
 
-import java.lang.annotation.Target;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class AbstractAspectjInterceptor<T> implements Advice {

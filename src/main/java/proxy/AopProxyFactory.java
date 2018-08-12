@@ -10,10 +10,10 @@ import expression.AdviceType;
 import expression.AspectjExpressionPointCut;
 import expression.MetaPointCut;
 import expression.PointCut;
-import interceptor.AfterInterceptor;
-import interceptor.AroundInterceptor;
-import interceptor.BeforeInterceptor;
-import interceptor.MethodInterceptor;
+import interceptor.AfterIntercept;
+import interceptor.AroundIntercept;
+import interceptor.BeforeIntercept;
+import interceptor.MethodIntercept;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -102,37 +102,37 @@ public class AopProxyFactory<T> implements ProxyFactory<T> {
     }
 
 
-    private List<MethodInterceptor> findCanApplyAdvice4Class(Class c) {
-        List<MethodInterceptor> methodInterceptors = new ArrayList<MethodInterceptor>();
+    private List<MethodIntercept> findCanApplyAdvice4Class(Class c) {
+        List<MethodIntercept> methodIntercepts = new ArrayList<MethodIntercept>();
         Method[] declaredMethods = c.getDeclaredMethods();
         for (Method declaredMethod : declaredMethods) {
-            methodInterceptors.addAll(findCanApplyAdvice4Method(declaredMethod));
+            methodIntercepts.addAll(findCanApplyAdvice4Method(declaredMethod));
         }
-        return methodInterceptors;
+        return methodIntercepts;
     }
 
-    private List<MethodInterceptor> findCanApplyAdvice4Method(Method declaredMethod) {
-        List<MethodInterceptor> methodInterceptors = new ArrayList<MethodInterceptor>();
+    private List<MethodIntercept> findCanApplyAdvice4Method(Method declaredMethod) {
+        List<MethodIntercept> methodIntercepts = new ArrayList<MethodIntercept>();
         if (getPointCut().size() == 0) {
-            return methodInterceptors;
+            return methodIntercepts;
         }
         for (PointCut cut : pointCut) {
             if (cut.match(declaredMethod)) {
                 AdviceType adviceType = cut.getAdviceType();
                 switch (adviceType) {
                     case AFTER:
-                        methodInterceptors.add(new AfterInterceptor(declaredMethod, cut));
+                        methodIntercepts.add(new AfterIntercept(declaredMethod, cut));
                         break;
                     case AROUND:
-                        methodInterceptors.add(new BeforeInterceptor(declaredMethod, cut));
+                        methodIntercepts.add(new BeforeIntercept(declaredMethod, cut));
                         break;
                     case BEFORE:
-                        methodInterceptors.add(new AroundInterceptor(declaredMethod, cut));
+                        methodIntercepts.add(new AroundIntercept(declaredMethod, cut));
                         break;
                 }
             }
         }
-        return methodInterceptors;
+        return methodIntercepts;
     }
 
     private Set<PointCut> getPointCut() {

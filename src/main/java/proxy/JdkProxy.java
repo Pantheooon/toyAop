@@ -1,22 +1,25 @@
 package proxy;
 
-import expression.PointCut;
-import interceptor.MethodInterceptor;
+import interceptor.MethodIntercept;
 
 import java.util.List;
-import java.util.Set;
 
-public class JdkProxy<T> extends AbstractAopProxy<T> {
+public class JdkProxy<T> implements AopProxy<T> {
 
 
     private Class[] interfaces;
 
-    public JdkProxy(List<MethodInterceptor> interceptors, T target, Class[] interfaces) {
-        super(interceptors, target);
+    private List<MethodIntercept> intercepts;
+
+    private T target;
+
+    public JdkProxy(List<MethodIntercept> interceptors, T target, Class[] interfaces) {
+        this.intercepts = interceptors;
+        this.target = target;
         this.interfaces = interfaces;
     }
 
-    public T get(T o) {
+    public T get(T t) {
         return null;
     }
 }

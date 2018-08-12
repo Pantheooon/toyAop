@@ -5,7 +5,7 @@ import advice.MethodInvocation;
 
 import java.lang.reflect.InvocationTargetException;
 
-public interface MethodInterceptor {
+public interface MethodIntercept {
 
 
     Object invoke(MethodInvocation invocation) throws InvocationTargetException, IllegalAccessException;

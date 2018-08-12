@@ -5,10 +5,10 @@ import expression.PointCut;
 
 import java.lang.reflect.Method;
 
-public class AroundInterceptor extends AbstractAspectjInterceptor implements MethodInterceptor {
+public class AroundIntercept extends AbstractAspectjInterceptor implements MethodIntercept {
 
 
-    public AroundInterceptor(Method method, PointCut cut) {
+    public AroundIntercept(Method method, PointCut cut) {
         super(method,cut);
     }
 
