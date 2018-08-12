@@ -1,16 +1,19 @@
 package proxy;
 
-import java.lang.reflect.Method;
+import expression.PointCut;
+import interceptor.MethodInterceptor;
+
+import java.util.List;
 import java.util.Set;
 
 public abstract class AbstractAopProxy<T> implements AopProxy<T> {
 
-    private Set<Method> methodSet;
+    private List<MethodInterceptor> interceptors;
 
     private T target;
 
-    public AbstractAopProxy(Set<Method> methods,T target) {
-        this.methodSet = methods;
+    public AbstractAopProxy(List<MethodInterceptor> interceptors, T target) {
+        this.interceptors = interceptors;
         this.target = target;
     }
 

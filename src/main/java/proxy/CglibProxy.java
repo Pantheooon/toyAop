@@ -1,11 +1,15 @@
 package proxy;
 
-import java.lang.reflect.Method;
+import expression.PointCut;
+import interceptor.MethodInterceptor;
+
+import java.util.List;
 import java.util.Set;
 
 public class CglibProxy<T> extends AbstractAopProxy<T> {
-    public CglibProxy(Set<Method> methods, T target) {
-        super(methods, target);
+
+    public CglibProxy(List<MethodInterceptor> interceptors, T target) {
+        super(interceptors, target);
     }
 
     public T get(T o) {

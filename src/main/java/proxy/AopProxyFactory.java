@@ -1,13 +1,19 @@
 package proxy;
 
-import advice.Advice;
 import annotation.After;
 import annotation.Around;
 import annotation.Aspect;
 import annotation.Before;
+import beans.BeanFactory;
+import beans.DefaultBeanFactory;
+import expression.AdviceType;
+import expression.AspectjExpressionPointCut;
+import expression.MetaPointCut;
+import expression.PointCut;
 import interceptor.AfterInterceptor;
 import interceptor.AroundInterceptor;
 import interceptor.BeforeInterceptor;
+import interceptor.MethodInterceptor;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -17,10 +23,12 @@ public class AopProxyFactory<T> implements ProxyFactory<T> {
 
     private List<Class> parsedAspect = new ArrayList<Class>();
 
-    private Set<Method> adviceList = new HashSet<Method>();
+    private Set<PointCut> pointCut = new HashSet<PointCut>();
 
+    private BeanFactory beanFactory = new DefaultBeanFactory();
 
     public T get(T t) {
+        beanFactory.addBean(t);
         return (T) createProxy(t).get(null);
     }
 
@@ -35,7 +43,7 @@ public class AopProxyFactory<T> implements ProxyFactory<T> {
         if (declaredMethods == null || declaredMethods.length == 0) {
             return;
         }
-        findAdviceMethod(declaredMethods);
+        findAdviceMethod(declaredMethods, beanFactory.getBean(aspectClass));
         parsedAspect.add(aspectClass);
     }
 
@@ -44,13 +52,14 @@ public class AopProxyFactory<T> implements ProxyFactory<T> {
      *
      * @param methods
      */
-    private void findAdviceMethod(Method[] methods) {
+    private void findAdviceMethod(Method[] methods, Object adviceObject) {
         if (methods == null || methods.length == 0) {
             return;
         }
         for (Method method : methods) {
             if (isAdvice(method)) {
-                adviceList.add(method);
+                MetaPointCut mpc = new MetaPointCut(method, adviceObject);
+                pointCut.add(new AspectjExpressionPointCut(mpc));
             }
         }
     }
@@ -87,9 +96,46 @@ public class AopProxyFactory<T> implements ProxyFactory<T> {
     public AopProxy createProxy(T t) {
         Class<?>[] interfaces = t.getClass().getInterfaces();
         if (interfaces == null || interfaces.length == 0) {
-            return new CglibProxy(adviceList, t);
+            return new CglibProxy(findCanApplyAdvice4Class(t.getClass()), t);
         }
-        return new JdkProxy(adviceList, t, interfaces);
+        return new JdkProxy(findCanApplyAdvice4Class(t.getClass()), t, interfaces);
     }
 
+
+    private List<MethodInterceptor> findCanApplyAdvice4Class(Class c) {
+        List<MethodInterceptor> methodInterceptors = new ArrayList<MethodInterceptor>();
+        Method[] declaredMethods = c.getDeclaredMethods();
+        for (Method declaredMethod : declaredMethods) {
+            methodInterceptors.addAll(findCanApplyAdvice4Method(declaredMethod));
+        }
+        return methodInterceptors;
+    }
+
+    private List<MethodInterceptor> findCanApplyAdvice4Method(Method declaredMethod) {
+        List<MethodInterceptor> methodInterceptors = new ArrayList<MethodInterceptor>();
+        if (getPointCut().size() == 0) {
+            return methodInterceptors;
+        }
+        for (PointCut cut : pointCut) {
+            if (cut.match(declaredMethod)) {
+                AdviceType adviceType = cut.getAdviceType();
+                switch (adviceType) {
+                    case AFTER:
+                        methodInterceptors.add(new AfterInterceptor(declaredMethod, cut));
+                        break;
+                    case AROUND:
+                        methodInterceptors.add(new BeforeInterceptor(declaredMethod, cut));
+                        break;
+                    case BEFORE:
+                        methodInterceptors.add(new AroundInterceptor(declaredMethod, cut));
+                        break;
+                }
+            }
+        }
+        return methodInterceptors;
+    }
+
+    private Set<PointCut> getPointCut() {
+        return this.pointCut;
+    }
 }

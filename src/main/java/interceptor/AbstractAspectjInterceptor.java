@@ -1,6 +1,7 @@
 package interceptor;
 
 import advice.Advice;
+import expression.PointCut;
 
 import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
@@ -17,7 +18,7 @@ public class AbstractAspectjInterceptor<T> implements Advice {
     private Object[] parameters;
 
 
-    protected AbstractAspectjInterceptor(Method method) {
+    protected AbstractAspectjInterceptor(Method method, PointCut cut) {
 
     }
 

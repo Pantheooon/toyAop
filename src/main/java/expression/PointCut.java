@@ -9,4 +9,6 @@ public interface PointCut {
 
 
     Boolean match(Method method);
+
+    AdviceType getAdviceType();
 }
