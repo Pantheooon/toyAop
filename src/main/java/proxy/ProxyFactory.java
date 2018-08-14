@@ -3,8 +3,8 @@ package proxy;
 public interface ProxyFactory<T> {
 
 
-    T get(T t);
+    T getProxy(T t);
 
 
-    void addAspect(Class aspectClass);
+    void addAspect(Object aspectClass);
 }

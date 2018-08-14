@@ -3,25 +3,23 @@ package interceptor;
 import advice.Advice;
 import expression.PointCut;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class AbstractAspectjInterceptor<T> implements Advice {
 
-    private Advice advice;
+    private PointCut pointCut;
 
-    private String targetName;
-
-    private Class<T> clazz;
-
-    private Object[] parameters;
-
+    private Method method;
 
     protected AbstractAspectjInterceptor(Method method, PointCut cut) {
-
+        this.pointCut = cut;
+        this.method = method;
     }
 
 
-    public Object invokeAdviceMethod() {
-        return null;
+    public Object invokeAdviceMethod() throws InvocationTargetException, IllegalAccessException {
+
+        return pointCut.invoke(null);
     }
 }

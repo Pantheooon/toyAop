@@ -1,5 +1,6 @@
 package expression;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public interface PointCut {
@@ -9,5 +10,10 @@ public interface PointCut {
 
 
     Boolean match(Method method);
+
+
+    AdviceType getAdviceType();
+
+    Object invoke(Object[] args) throws InvocationTargetException, IllegalAccessException;
 
 }

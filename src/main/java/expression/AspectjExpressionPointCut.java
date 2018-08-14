@@ -1,5 +1,6 @@
 package expression;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class AspectjExpressionPointCut implements PointCut {
@@ -27,7 +28,7 @@ public class AspectjExpressionPointCut implements PointCut {
     /**
      * 处理表达式的解析器
      */
-    private ExpressionDiscovery expressionDiscovery;
+    private ExpressionParseChain chain;
 
 
     public AspectjExpressionPointCut(MetaPointCut mpc) {
@@ -35,6 +36,8 @@ public class AspectjExpressionPointCut implements PointCut {
         method = mpc.getMethod();
         object = mpc.getAdviceType();
         adviceType = mpc.getAdviceType();
+        object = mpc.getAdviceObject();
+        chain = new ExpressionParseChain(expression);
     }
 
     public String getExpression() {
@@ -42,10 +45,14 @@ public class AspectjExpressionPointCut implements PointCut {
     }
 
     public Boolean match(Method method) {
-        return expressionDiscovery.match(method);
+        return chain.match(method);
     }
 
     public AdviceType getAdviceType() {
         return this.adviceType;
+    }
+
+    public Object invoke(Object[] args) throws InvocationTargetException, IllegalAccessException {
+        return method.invoke(object,args);
     }
 }

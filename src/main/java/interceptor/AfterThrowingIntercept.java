@@ -6,16 +6,19 @@ import expression.PointCut;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class BeforeIntercept extends AbstractAspectjInterceptor implements MethodIntercept {
+public class AfterThrowingIntercept extends AbstractAspectjInterceptor implements MethodIntercept {
 
 
-    public BeforeIntercept(Method method, PointCut cut) {
+    public AfterThrowingIntercept(Method method, PointCut cut) {
         super(method, cut);
     }
 
     public Object invoke(MethodInvocation invocation) throws InvocationTargetException, IllegalAccessException {
-
-        invokeAdviceMethod();
-        return invocation.proceed();
+        try {
+            return invocation.proceed();
+        } catch (Throwable ex) {
+            invokeAdviceMethod();
+            throw ex;
+        }
     }
 }

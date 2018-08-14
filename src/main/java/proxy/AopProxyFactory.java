@@ -1,17 +1,15 @@
 package proxy;
 
 import annotation.After;
-import annotation.Around;
+import annotation.AfterThrowing;
 import annotation.Aspect;
 import annotation.Before;
-import beans.BeanFactory;
-import beans.DefaultBeanFactory;
 import expression.AdviceType;
 import expression.AspectjExpressionPointCut;
 import expression.MetaPointCut;
 import expression.PointCut;
 import interceptor.AfterIntercept;
-import interceptor.AroundIntercept;
+import interceptor.AfterThrowingIntercept;
 import interceptor.BeforeIntercept;
 import interceptor.MethodIntercept;
 
@@ -25,26 +23,25 @@ public class AopProxyFactory<T> implements ProxyFactory<T> {
 
     private Set<PointCut> pointCut = new HashSet<PointCut>();
 
-    private BeanFactory beanFactory = new DefaultBeanFactory();
 
-    public T get(T t) {
-        beanFactory.addBean(t);
-        return (T) createProxy(t).get(null);
+    public T getProxy(T t) {
+        return (T) createProxy(t).get(t);
     }
 
-    public void addAspect(Class aspectClass) {
-        if (validate(aspectClass)) {
+    public void addAspect(Object aspect) {
+        Class<?> aClass = aspect.getClass();
+        if (!validate(aClass)) {
             throw new IllegalArgumentException("切面类缺少aspect注解");
         }
-        if (parsedAspect.contains(aspectClass)) {
+        if (parsedAspect.contains(aClass)) {
             return;
         }
-        Method[] declaredMethods = aspectClass.getDeclaredMethods();
+        Method[] declaredMethods = aClass.getDeclaredMethods();
         if (declaredMethods == null || declaredMethods.length == 0) {
             return;
         }
-        findAdviceMethod(declaredMethods, beanFactory.getBean(aspectClass));
-        parsedAspect.add(aspectClass);
+        findAdviceMethod(declaredMethods, aspect);
+        parsedAspect.add(aClass);
     }
 
     /**
@@ -73,7 +70,7 @@ public class AopProxyFactory<T> implements ProxyFactory<T> {
     private boolean isAdvice(Method method) {
         return method.getAnnotation(Before.class) != null
                 || method.getAnnotation(After.class) != null
-                || method.getAnnotation(Around.class) != null;
+                || method.getAnnotation(AfterThrowing.class) != null;
     }
 
     /**
@@ -123,11 +120,11 @@ public class AopProxyFactory<T> implements ProxyFactory<T> {
                     case AFTER:
                         methodIntercepts.add(new AfterIntercept(declaredMethod, cut));
                         break;
-                    case AROUND:
+                    case BEFORE:
                         methodIntercepts.add(new BeforeIntercept(declaredMethod, cut));
                         break;
-                    case BEFORE:
-                        methodIntercepts.add(new AroundIntercept(declaredMethod, cut));
+                    case AFTERTHROWING:
+                        methodIntercepts.add(new AfterThrowingIntercept(declaredMethod, cut));
                         break;
                 }
             }

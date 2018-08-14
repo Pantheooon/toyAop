@@ -2,7 +2,7 @@ package expression;
 
 import java.lang.reflect.Method;
 
-public class StringExpressionDiscovery implements ExpressionDiscovery {
+public class StringExpressionDiscovery implements ExpressionParse {
 
 
     private String packageName;

@@ -2,5 +2,5 @@ package expression;
 
 public enum AdviceType {
 
-    BEFORE,AFTER,AROUND
+    BEFORE,AFTER,AFTERTHROWING
 }

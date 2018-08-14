@@ -9,6 +9,7 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class CglibProxy<T> implements AopProxy<T>, MethodInterceptor {
         return (T) enhancer.create();
     }
 
-    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) {
+    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws InvocationTargetException, IllegalAccessException {
         JoinPoint invocation = new ReflectiveMethodInvocation(intercepts, new TargetObject(target, args, method));
         return invocation.proceed();
     }

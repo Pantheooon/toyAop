@@ -21,25 +21,23 @@ public class ReflectiveMethodInvocation implements MethodInvocation, JoinPoint {
         this.targetObject = object;
     }
 
+    int invokedSize = 0;
+
     public Object proceed() throws InvocationTargetException, IllegalAccessException {
 
-        int invokedSize = 0;
+
 
         if (invokedSize == chain.size()) {
             return invokeJoinPoint();
         }
 
-        for (MethodIntercept methodIntercept : chain) {
-            methodIntercept.invoke(this);
-        }
-        return null;
+        MethodIntercept methodIntercept = chain.get(invokedSize);
+        invokedSize ++;
+        return methodIntercept.invoke(this);
     }
 
     private Object invokeJoinPoint() throws InvocationTargetException, IllegalAccessException {
         return targetObject.invoke();
     }
 
-    public Method getMethod() {
-        return null;
-    }
 }

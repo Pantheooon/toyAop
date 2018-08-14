@@ -1,7 +1,7 @@
 package expression;
 
 import annotation.After;
-import annotation.Around;
+import annotation.AfterThrowing;
 import annotation.Before;
 
 import java.lang.reflect.Method;
@@ -48,9 +48,9 @@ public class MetaPointCut {
             expression = before.value();
             return;
         }
-        Around around = method.getAnnotation(Around.class);
+        AfterThrowing around = method.getAnnotation(AfterThrowing.class);
         if (around != null) {
-            adviceType = AdviceType.AROUND;
+            adviceType = AdviceType.AFTERTHROWING;
             expression = around.value();
             return;
         }
