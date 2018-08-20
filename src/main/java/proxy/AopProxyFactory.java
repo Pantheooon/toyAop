@@ -91,11 +91,7 @@ public class AopProxyFactory<T> implements ProxyFactory<T> {
     }
 
     public AopProxy createProxy(T t) {
-        Class<?>[] interfaces = t.getClass().getInterfaces();
-        if (interfaces == null || interfaces.length == 0) {
-            return new CglibProxy(findCanApplyAdvice4Class(t.getClass()), t);
-        }
-        return new JdkProxy(findCanApplyAdvice4Class(t.getClass()), t, interfaces);
+        return new CglibProxy(findCanApplyAdvice4Class(t.getClass()), t);
     }
 
 
